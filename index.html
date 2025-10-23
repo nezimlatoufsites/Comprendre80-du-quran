@@ -39,7 +39,7 @@ button {
 button:hover { background-color: #238636; }
 
 main {
-  padding: 18px;
+  padding: 18px 18px 18px 60px;
 }
 
 section {
@@ -68,6 +68,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 li {
   margin: 16px 0;
   padding: 16px;
+  padding-bottom: 50px;
   border-radius: 10px;
   display: flex;
   justify-content: space-between;
@@ -75,6 +76,44 @@ li {
   background: rgba(255,255,255,0.01);
   gap: 40px;
   position: relative;
+  cursor: move;
+}
+
+li.dragging {
+  opacity: 0.5;
+  background: rgba(255,255,255,0.05);
+}
+
+.drag-handle {
+  position: absolute;
+  left: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  cursor: grab;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle span {
+  width: 18px;
+  height: 2px;
+  background-color: #e6edf3;
+  border-radius: 1px;
 }
 
 .right-side {
@@ -131,14 +170,14 @@ span.verse-translation {
 
 .edit-btn {
   position: absolute;
-  top: 8px;
+  bottom: 8px;
   right: 8px;
   background-color: #238636;
   color: white;
   border: none;
-  padding: 4px 8px;
-  font-size: 12px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
   cursor: pointer;
   transition: 0.2s;
 }
@@ -281,11 +320,16 @@ async function ajouterItem(sectionId) {
     if (!verseTrad) verseTrad = "";
 
     try {
+        // Récupérer le nombre d'items pour définir l'ordre
+        const querySnapshot = await window.getDocs(window.collection(window.db, sectionId));
+        const order = querySnapshot.size;
+        
         await window.addDoc(window.collection(window.db, sectionId), {
             ar: ar,
             fr: fr,
             verse: verse,
             verseTrad: verseTrad,
+            order: order,
             timestamp: Date.now()
         });
         console.log("Item ajouté avec succès !");
@@ -336,18 +380,62 @@ async function afficherSection(sectionId) {
             return;
         }
         
+        // Trier par ordre
+        const items = [];
         querySnapshot.forEach((docSnapshot) => {
-            const item = docSnapshot.data();
-            const docId = docSnapshot.id;
+            items.push({
+                id: docSnapshot.id,
+                data: docSnapshot.data()
+            });
+        });
+        items.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+        
+        items.forEach((item) => {
+            const docId = item.id;
+            const itemData = item.data;
             const li = document.createElement("li");
+            li.draggable = true;
+            li.dataset.docId = docId;
+            
+            // Poignée de drag
+            const dragHandle = document.createElement("div");
+            dragHandle.className = "drag-handle";
+            dragHandle.innerHTML = "<span></span><span></span><span></span>";
+            
+            // Événements de drag
+            li.addEventListener("dragstart", (e) => {
+                li.classList.add("dragging");
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/html", li.innerHTML);
+            });
+            
+            li.addEventListener("dragend", () => {
+                li.classList.remove("dragging");
+            });
+            
+            li.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                const dragging = document.querySelector(".dragging");
+                const afterElement = getDragAfterElement(ul, e.clientY);
+                if (afterElement == null) {
+                    ul.appendChild(dragging);
+                } else {
+                    ul.insertBefore(dragging, afterElement);
+                }
+            });
+            
+            li.addEventListener("drop", async (e) => {
+                e.preventDefault();
+                await updateOrder(sectionId);
+            });
             
             // Bouton modifier
             const editBtn = document.createElement("button");
             editBtn.className = "edit-btn";
-            editBtn.textContent = "✏️";
+            editBtn.textContent = "✏️ Modifier";
             editBtn.onclick = (e) => {
                 e.stopPropagation();
-                modifierItem(sectionId, docId, item);
+                modifierItem(sectionId, docId, itemData);
             };
             
             // Côté droit : mot arabe + traduction
@@ -356,11 +444,11 @@ async function afficherSection(sectionId) {
             
             const spanAr = document.createElement("span");
             spanAr.className = "ar";
-            spanAr.textContent = item.ar;
+            spanAr.textContent = itemData.ar;
             
             const spanFr = document.createElement("span");
             spanFr.className = "fr";
-            spanFr.textContent = item.fr;
+            spanFr.textContent = itemData.fr;
             
             rightDiv.appendChild(spanAr);
             rightDiv.appendChild(spanFr);
@@ -369,20 +457,21 @@ async function afficherSection(sectionId) {
             const leftDiv = document.createElement("div");
             leftDiv.className = "left-side";
             
-            if (item.verse) {
+            if (itemData.verse) {
                 const spanVerse = document.createElement("span");
                 spanVerse.className = "verse";
-                spanVerse.textContent = item.verse;
+                spanVerse.textContent = itemData.verse;
                 leftDiv.appendChild(spanVerse);
             }
             
-            if (item.verseTrad) {
+            if (itemData.verseTrad) {
                 const spanVerseTrad = document.createElement("span");
                 spanVerseTrad.className = "verse-translation";
-                spanVerseTrad.textContent = item.verseTrad;
+                spanVerseTrad.textContent = itemData.verseTrad;
                 leftDiv.appendChild(spanVerseTrad);
             }
             
+            li.appendChild(dragHandle);
             li.appendChild(editBtn);
             li.appendChild(rightDiv);
             li.appendChild(leftDiv);
@@ -392,6 +481,42 @@ async function afficherSection(sectionId) {
         console.error("Erreur lors du chargement :", error);
         loadingDiv.textContent = "Erreur de chargement. Vérifiez la console.";
         loadingDiv.style.color = "#da3633";
+    }
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+    
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+async function updateOrder(sectionId) {
+    const ul = document.querySelector(`#${sectionId} ul`);
+    const items = ul.querySelectorAll("li");
+    
+    const updates = [];
+    items.forEach((li, index) => {
+        const docId = li.dataset.docId;
+        if (docId) {
+            const docRef = window.doc(window.db, sectionId, docId);
+            updates.push(window.updateDoc(docRef, { order: index }));
+        }
+    });
+    
+    try {
+        await Promise.all(updates);
+        console.log("Ordre mis à jour !");
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de l'ordre :", error);
     }
 }
 </script>
