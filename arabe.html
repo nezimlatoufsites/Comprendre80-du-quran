@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>📖 Vocabulaire Coranique</title>
+<style>
+body {
+  background-color: #0d1117;
+  color: #e6edf3;
+  font-family: "Amiri", serif;
+  direction: rtl;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #161b22;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 10px;
+  gap: 12px;
+  border-bottom: 2px solid #30363d;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+button {
+  background-color: #21262d;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+button:hover { background-color: #238636; }
+
+main {
+  padding: 18px;
+}
+
+section {
+  display: none;
+  padding: 20px;
+  text-align: right;
+  max-width: 1200px;
+  margin: 18px auto;
+  background: rgba(255,255,255,0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+section.active { display: block; }
+
+h2 {
+  color: #39d353;
+  font-size: 22px;
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+ul { list-style: none; padding: 0; margin: 0; }
+
+li {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.01);
+  gap: 40px;
+  position: relative;
+}
+
+.right-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 35%;
+  margin-right: auto;
+}
+
+.left-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 55%;
+  margin-left: auto;
+}
+
+span.ar { 
+  font-size: 38px; 
+  font-weight: bold; 
+  color: #f5c518; 
+  display: block;
+  text-align: right;
+  margin-bottom: 8px;
+}
+
+span.fr { 
+  font-size: 18px; 
+  color: #c9d1d9; 
+  display: block;
+  text-align: right;
+}
+
+span.verse {
+  display: block;
+  font-size: 28px;
+  font-weight: bold;
+  color: #3f7fbf;
+  margin-bottom: 8px;
+  direction: rtl;
+  text-align: left;
+  line-height: 1.8;
+}
+
+span.verse-translation {
+  display: block;
+  font-size: 16px;
+  color: #8b949e;
+  direction: ltr;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #238636;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #2ea043;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #8b949e;
+  font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button onclick="showSection('noms')">🕌 Noms d'Allah et attributs</button>
+  <button onclick="showSection('foi')">✨ La foi et la religion</button>
+  <button onclick="showSection('creation')">🌍 La création et l'univers</button>
+  <button onclick="showSection('relations')">👨‍👩‍👧 Relations humaines</button>
+  <button onclick="showSection('actions')">⚖️ Actions et morale</button>
+  <button onclick="showSection('objets')">🌍 Objets, lieux et temps</button>
+  <button onclick="showSection('verbes')">📘 Verbes</button>
+</header>
+
+<main>
+
+<section id="noms" class="active">
+<h2>🕌 Noms d'Allah et attributs</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('noms')">➕ Ajouter</button>
+</section>
+
+<section id="foi">
+<h2>✨ La foi et la religion</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('foi')">➕ Ajouter</button>
+</section>
+
+<section id="creation">
+<h2>🌍 La création et l'univers</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('creation')">➕ Ajouter</button>
+</section>
+
+<section id="relations">
+<h2>👨‍👩‍👧 Relations humaines, familles et peuples</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('relations')">➕ Ajouter</button>
+</section>
+
+<section id="actions">
+<h2>⚖️ Actions, comportements et morale</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('actions')">➕ Ajouter</button>
+</section>
+
+<section id="objets">
+<h2>🌍 Objets, lieux, temps et termes généraux</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('objets')">➕ Ajouter</button>
+</section>
+
+<section id="verbes">
+<h2>📘 Verbes</h2>
+<div class="loading">Chargement...</div>
+<ul></ul>
+<button onclick="ajouterItem('verbes')">➕ Ajouter</button>
+</section>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Configuration Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBdDJ6WZOeTvKDI4RzM6pNwRnd0OFI29EQ",
+    authDomain: "vocabulaire-coranique-9e09b.firebaseapp.com",
+    projectId: "vocabulaire-coranique-9e09b",
+    storageBucket: "vocabulaire-coranique-9e09b.firebasestorage.app",
+    messagingSenderId: "71465575789",
+    appId: "1:71465575789:web:bb1f681fbc94f76b176664"
+  };
+
+  // Initialiser Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Rendre les fonctions disponibles globalement
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.doc = doc;
+  window.updateDoc = updateDoc;
+  window.deleteDoc = deleteDoc;
+  window.onSnapshot = onSnapshot;
+
+  // Charger toutes les sections au démarrage
+  ['noms','foi','creation','relations','actions','objets','verbes'].forEach(id => {
+    afficherSection(id);
+    // Écouter les changements en temps réel
+    const collectionRef = collection(db, id);
+    onSnapshot(collectionRef, () => {
+      afficherSection(id);
+    });
+  });
+
+  // Restaurer la section active
+  const savedSection = localStorage.getItem('currentSection') || 'noms';
+  showSection(savedSection);
+</script>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  localStorage.setItem('currentSection', id);
+}
+
+// Fonction pour ajouter un item dans Firebase
+async function ajouterItem(sectionId) {
+    let ar = prompt("Entrez le mot/nom en arabe :");
+    if (!ar) return;
+    let fr = prompt("Entrez la traduction en français :");
+    if (!fr) fr = "";
+    let verse = prompt("Entrez un verset en arabe (facultatif) :");
+    if (!verse) verse = "";
+    let verseTrad = prompt("Entrez la traduction du verset (facultatif) :");
+    if (!verseTrad) verseTrad = "";
+
+    try {
+        await window.addDoc(window.collection(window.db, sectionId), {
+            ar: ar,
+            fr: fr,
+            verse: verse,
+            verseTrad: verseTrad,
+            timestamp: Date.now()
+        });
+        console.log("Item ajouté avec succès !");
+    } catch (error) {
+        console.error("Erreur lors de l'ajout :", error);
+        alert("Erreur lors de l'ajout. Vérifiez la console.");
+    }
+}
+
+// Fonction pour modifier un item
+async function modifierItem(sectionId, docId, currentData) {
+    let ar = prompt("Modifier le mot/nom en arabe :", currentData.ar);
+    if (ar === null) return;
+    let fr = prompt("Modifier la traduction en français :", currentData.fr);
+    if (fr === null) return;
+    let verse = prompt("Modifier le verset en arabe (facultatif) :", currentData.verse);
+    if (verse === null) return;
+    let verseTrad = prompt("Modifier la traduction du verset (facultatif) :", currentData.verseTrad);
+    if (verseTrad === null) return;
+    
+    try {
+        const docRef = window.doc(window.db, sectionId, docId);
+        await window.updateDoc(docRef, {
+            ar: ar,
+            fr: fr,
+            verse: verse,
+            verseTrad: verseTrad
+        });
+        console.log("Item modifié avec succès !");
+    } catch (error) {
+        console.error("Erreur lors de la modification :", error);
+        alert("Erreur lors de la modification. Vérifiez la console.");
+    }
+}
+
+// Afficher une section depuis Firebase
+async function afficherSection(sectionId) {
+    const ul = document.querySelector(`#${sectionId} ul`);
+    const loadingDiv = document.querySelector(`#${sectionId} .loading`);
+    
+    try {
+        const querySnapshot = await window.getDocs(window.collection(window.db, sectionId));
+        ul.innerHTML = "";
+        loadingDiv.style.display = "none";
+        
+        if (querySnapshot.empty) {
+            ul.innerHTML = "<li style='text-align:center; color:#8b949e;'>Aucun mot pour le moment. Cliquez sur ➕ Ajouter pour commencer !</li>";
+            return;
+        }
+        
+        querySnapshot.forEach((docSnapshot) => {
+            const item = docSnapshot.data();
+            const docId = docSnapshot.id;
+            const li = document.createElement("li");
+            
+            // Bouton modifier
+            const editBtn = document.createElement("button");
+            editBtn.className = "edit-btn";
+            editBtn.textContent = "✏️";
+            editBtn.onclick = (e) => {
+                e.stopPropagation();
+                modifierItem(sectionId, docId, item);
+            };
+            
+            // Côté droit : mot arabe + traduction
+            const rightDiv = document.createElement("div");
+            rightDiv.className = "right-side";
+            
+            const spanAr = document.createElement("span");
+            spanAr.className = "ar";
+            spanAr.textContent = item.ar;
+            
+            const spanFr = document.createElement("span");
+            spanFr.className = "fr";
+            spanFr.textContent = item.fr;
+            
+            rightDiv.appendChild(spanAr);
+            rightDiv.appendChild(spanFr);
+            
+            // Côté gauche : verset + traduction
+            const leftDiv = document.createElement("div");
+            leftDiv.className = "left-side";
+            
+            if (item.verse) {
+                const spanVerse = document.createElement("span");
+                spanVerse.className = "verse";
+                spanVerse.textContent = item.verse;
+                leftDiv.appendChild(spanVerse);
+            }
+            
+            if (item.verseTrad) {
+                const spanVerseTrad = document.createElement("span");
+                spanVerseTrad.className = "verse-translation";
+                spanVerseTrad.textContent = item.verseTrad;
+                leftDiv.appendChild(spanVerseTrad);
+            }
+            
+            li.appendChild(editBtn);
+            li.appendChild(rightDiv);
+            li.appendChild(leftDiv);
+            ul.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Erreur lors du chargement :", error);
+        loadingDiv.textContent = "Erreur de chargement. Vérifiez la console.";
+        loadingDiv.style.color = "#da3633";
+    }
+}
+</script>
+
+</body>
+</html>
